@@ -1,4 +1,16 @@
+# Прототип
 <img src="https://github.com/kuznetsov-m/arduino_wether_station/blob/master/images/photo.jpeg" alt="" width="600" />
+
+# Функционал
+- WiFi подключение
+- получение данных с сенсора BME200: температура, влажность, давление, высота
+- запись данных на SD карту
+- отправка данных на web сервер
+
+# Модули
+- NodeMCU
+- BME200 sensor
+- SD card shield
 
 # Links
 https://robotchip.ru/meteostantsiya-na-bme280-i-esp8266/
