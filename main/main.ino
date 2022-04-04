@@ -127,12 +127,12 @@ void send_data(const String& date_time_string, const bme_data& data) {
     WiFiClient client;
     HTTPClient http;
 
-    String url = String(device_config::server_name) + "?"
-      + "datetime=" + String(date_time_string)
-      + "temperature=" + String(data.temperature, 2)
-      + "pressure=" + String(data.pressure, 2)
-      + "altitude=" + String(data.altitude, 2)
-      + "humidity=" + String(data.humidity, 2);
+    String url = String(device_config::server_name)
+      + "?" + "datetime=" + String(date_time_string)
+      + "&" + "temperature=" + String(data.temperature, 2)
+      + "&" + "pressure=" + String(data.pressure, 2)
+      + "&" + "altitude=" + String(data.altitude, 2)
+      + "&" + "humidity=" + String(data.humidity, 2);
     Serial.println("URL: " + url);
 
     http.begin(client, url.c_str());
