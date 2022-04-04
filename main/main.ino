@@ -44,10 +44,10 @@ void setup(){
 
   // WiFi
   {
-    WiFi.begin(wifi_config::ssid, wifi_config::password);
+    WiFi.begin(device_config::wifi::ssid, device_config::wifi::password);
   
     Serial.print("Connecting to WiFi \"");
-    Serial.print(wifi_config::ssid);
+    Serial.print(device_config::wifi::ssid);
     Serial.print("\" ");
     while (WiFi.status() != WL_CONNECTED) {
       delay(500);
@@ -77,6 +77,7 @@ void setup(){
   
   //
   Serial.println(ntp_helper::getFormattedDate(ntpClient));
+  Serial.println("Write data interval: " + String(device_config::write_data_interval));
 }
 
 void loop() {
@@ -91,7 +92,7 @@ void loop() {
 
   send_data(date_time_string, data);
   
-  delay(1000);
+  delay(device_config::write_data_interval);
 }
 
 bme_data read_bme_data() {
@@ -104,7 +105,7 @@ bme_data read_bme_data() {
 }
 
 void write_bme_data(const String& date_time_string, const bme_data& data) {
-  bme_data_file = SD.open(file_name, FILE_WRITE);
+  bme_data_file = SD.open(device_config::file_name, FILE_WRITE);
   if (bme_data_file) {
     Serial.print("Writing to file...");
 
@@ -126,7 +127,7 @@ void send_data(const String& date_time_string, const bme_data& data) {
     WiFiClient client;
     HTTPClient http;
 
-    String url = serverName + "?"
+    String url = String(device_config::server_name) + "?"
       + "datetime=" + String(date_time_string)
       + "temperature=" + String(data.temperature, 2)
       + "pressure=" + String(data.pressure, 2)

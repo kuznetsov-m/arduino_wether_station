@@ -1,13 +1,18 @@
-#ifndef MY_VARIABLES_H
-#define MY_VARIABLES_H
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
-namespace wifi_config {
-  const char* ssid = "";
-  const char* password = "";
+namespace device_config {
+  namespace wifi {
+    const char* ssid = "";
+    const char* password = "";
+  }
+
+  const char* server_name = "";
+  
+  const char* file_name = "bme_data.txt";
+
+  // интервал опроса BME200 и записи данных (мс)
+  const unsigned int write_data_interval = 1 * 1000;
 }
 
-String serverName = "";
-
-const char* file_name = "bme_data.txt";
-
-#endif // MY_VARIABLES_H
+#endif // CONSTANTS_H
