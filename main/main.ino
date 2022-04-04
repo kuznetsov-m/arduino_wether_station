@@ -8,7 +8,7 @@
 // BME200
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
-#define SEALEVELPRESSURE_HPA (1013.25)                  // Задаем высоту
+#define SEALEVELPRESSURE_HPA (1013.25)  // Задаем высоту
 
 #include "constants.h"
 #include "my_functions.h"
@@ -63,6 +63,7 @@ void setup(){
   // SD card
   Serial.print("Initializing SD card...");
   sd_card_is_ready = SD.begin(D8);
+  Serial.println(sd_card_is_ready ? "done." : "failed!");
 
   if (sd_card_is_ready) {
     root = SD.open("/");
@@ -82,7 +83,7 @@ void loop() {
 
   Serial.print(date_time_string + "\t");
   Serial.printf("%.2f\t%.2f\t%.2f\t%.2f",
-    date_time_string, data.temperature, data.pressure, data.altitude, data.humidity
+    data.temperature, data.pressure, data.altitude, data.humidity
   );
   Serial.println();
 
