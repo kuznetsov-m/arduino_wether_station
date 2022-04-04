@@ -5,6 +5,10 @@
 // SD card
 #include <SPI.h>
 #include <SD.h>
+// BME200
+#include <Adafruit_BME280.h>
+#include <Adafruit_Sensor.h>
+#define SEALEVELPRESSURE_HPA (1013.25)                  // Задаем высоту
 
 #include "constants.h"
 #include "my_functions.h"
@@ -18,6 +22,9 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 // SD card
 File root;
 bool sd_card_is_ready = false;
+
+// BME200
+Adafruit_BME280 bme;
 
 struct bme_data {
   float temperature;
@@ -45,6 +52,8 @@ void setup(){
       Serial.print(".");
     }
     Serial.println("connected.");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
   }
 
   // NTP Client
@@ -54,11 +63,14 @@ void setup(){
   // SD card
   Serial.print("Initializing SD card...");
   sd_card_is_ready = SD.begin(D8);
-  Serial.println(sd_card_is_ready ? "done." : "failed!");
 
   if (sd_card_is_ready) {
     root = SD.open("/");
   }
+
+  // BME200
+  Serial.print("Initializing BME200 sensor...");
+  Serial.println(bme.begin(0x76) ? "done." : "Could not find a valid BME280 sensor!");
   
   //
   Serial.println(ntp_helper::getFormattedDate(timeClient));
@@ -82,7 +94,12 @@ void loop() {
 }
 
 bme_data read_bme_data() {
-  return bme_data{26.5, 256.1, 1024.3, 11.22};
+  return bme_data{
+    bme.readTemperature(),
+    bme.readPressure() / 100.0F,
+    bme.readAltitude(SEALEVELPRESSURE_HPA),
+    bme.readHumidity()
+  };
 }
 
 void write_bme_data(const String& date_time_string, const bme_data& data) {
@@ -90,7 +107,8 @@ void write_bme_data(const String& date_time_string, const bme_data& data) {
   if (bme_data_file) {
     Serial.print("Writing to file...");
 
-    bme_data_file.print(date_time_string + "\t");
+    bme_data_file.print(date_time_string);
+    bme_data_file.print("\t");
     bme_data_file.printf("%.2f\t%.2f\t%.2f\t%.2f", data.temperature, data.pressure, data.altitude, data.humidity);
     bme_data_file.println();
     bme_data_file.close();
