@@ -1,3 +1,5 @@
+<img src="https://github.com/kuznetsov-m/arduino_wether_station/blob/master/images/photo.jpeg" alt="" width="600" />
+
 # Links
 https://robotchip.ru/meteostantsiya-na-bme280-i-esp8266/
 
