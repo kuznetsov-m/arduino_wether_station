@@ -9,6 +9,8 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
 #define SEALEVELPRESSURE_HPA (1013.25)  // Задаем высоту
+// HTTP
+#include <ESP8266HTTPClient.h>
 
 #include "constants.h"
 #include "my_functions.h"
@@ -17,7 +19,7 @@ const long utcOffsetInSeconds = 3600;
 
 // Define NTP Client to get time
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
+NTPClient ntpClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 
 // SD card
 File root;
@@ -57,8 +59,8 @@ void setup(){
   }
 
   // NTP Client
-  timeClient.begin();
-  timeClient.update();
+  ntpClient.begin();
+  ntpClient.update();
 
   // SD card
   Serial.print("Initializing SD card...");
@@ -74,11 +76,11 @@ void setup(){
   Serial.println(bme.begin(0x76) ? "done." : "Could not find a valid BME280 sensor!");
   
   //
-  Serial.println(ntp_helper::getFormattedDate(timeClient));
+  Serial.println(ntp_helper::getFormattedDate(ntpClient));
 }
 
 void loop() {
-  String date_time_string(ntp_helper::getFormattedDate(timeClient));
+  String date_time_string(ntp_helper::getFormattedDate(ntpClient));
   bme_data data = read_bme_data();
 
   Serial.print(date_time_string + "\t");
@@ -87,9 +89,7 @@ void loop() {
   );
   Serial.println();
 
-  if (sd_card_is_ready) {
-    write_bme_data(date_time_string, data);
-  }
+  send_data(date_time_string, data);
   
   delay(1000);
 }
@@ -117,5 +117,40 @@ void write_bme_data(const String& date_time_string, const bme_data& data) {
     Serial.println("done.");
   } else {
     Serial.println("error opening file");
+  }
+}
+
+// Send data to server or write to file
+void send_data(const String& date_time_string, const bme_data& data) {
+  if (WiFi.status() == WL_CONNECTED) {
+    WiFiClient client;
+    HTTPClient http;
+
+    String url = serverName + "?"
+      + "datetime=" + String(date_time_string)
+      + "temperature=" + String(data.temperature, 2)
+      + "pressure=" + String(data.pressure, 2)
+      + "altitude=" + String(data.altitude, 2)
+      + "humidity=" + String(data.humidity, 2);
+    Serial.println("URL: " + url);
+
+    http.begin(client, url.c_str());
+    int httpResponseCode = http.GET();
+
+    if (httpResponseCode > 0) {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      String payload = http.getString();
+      Serial.println(payload);
+    }
+    else {
+      Serial.print("Error code: ");
+      Serial.println(httpResponseCode);
+    }
+
+    http.end();
+  }
+  else if (sd_card_is_ready) {
+    write_bme_data(date_time_string, data);
   }
 }
