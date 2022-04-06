@@ -12,6 +12,9 @@
 - BME200 sensor
 - SD card shield
 
+# Идеи по улучшению
+- индикация проблем подключения к Wi-Fi
+
 # Links
 https://robotchip.ru/meteostantsiya-na-bme280-i-esp8266/
 
