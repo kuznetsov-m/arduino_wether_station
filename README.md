@@ -12,6 +12,9 @@
 - BME200 sensor
 - SD card shield
 
+# Схема
+<img src="https://github.com/kuznetsov-m/arduino_wether_station/blob/master/images/1_scheme.png" alt="scheme" width="600" />
+
 # Идеи по улучшению
 - индикация проблем подключения к Wi-Fi
 - проблемы с синхронизацией времени при запуске устройства
